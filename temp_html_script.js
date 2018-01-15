@@ -10,20 +10,21 @@ var test=function(){
           this.space = space;
           this.space.updateAgent(this, initial_x, initial_y);
           this.sight = 75;
-          this.speed = 12;
+          this.speed = 3;
           this.separation_space = 30;
           this.velocity = new jssim.Vector2D(Math.random(), Math.random());
           this.isPredator = isPredator;
           this.border = 1;
           this.boundary = 640;
-          this.size = new jssim.Vector2D(8, 8);
+          this.size = new jssim.Vector2D(5, 5);
           this.color = '#00ff00';
           if(isPredator){
               this.color = '#eeff00';
-              this.size = new jssim.Vector2D(10, 10);
+              this.size = new jssim.Vector2D(8, 8);
           }
           else{
-              this.speed = 12
+              this.space.updateAgent(this, initial_x+Math.random()*100, initial_y+Math.random()*100);
+
           }
       };
       Boid.prototype = Object.create(jssim.SimEvent);
@@ -51,6 +52,14 @@ var test=function(){
                         // Separation
                         this.velocity.x += pos.x - boid_pos.x;
                         this.velocity.y += pos.y - boid_pos.y;
+                    }
+                    else {
+                        if (distance > this.separation_space*2)
+                        {
+                        //attraction
+                        this.velocity.x -= pos.x - boid_pos.x;
+                        this.velocity.y -= pos.y - boid_pos.y;
+                        }
                     }
                 }
             }
@@ -117,8 +126,8 @@ var test=function(){
       scheduler.reset();
       var space = new jssim.Space2D();
       space.reset();
-      for(var i = 0; i < 20; ++i) {
-          var is_predator = i > 10;
+      for(var i = 0; i < 50; ++i) {
+          var is_predator = i > 3;
           var boid = new Boid(i, 300, 300, space, is_predator);
           scheduler.scheduleRepeatingIn(boid, 1);
       }
