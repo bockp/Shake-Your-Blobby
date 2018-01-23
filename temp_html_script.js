@@ -117,9 +117,9 @@ var test=function(){
             }
             if(prey != null) {
                 var prey_position = this.space.getLocation(prey.id);
-                var distance_to_prey = pos.distance(prey.id);
-                this.velocity.x += (prey_position.x - pos.x)/distance_to_prey;
-                this.velocity.y += (prey_position.y - pos.y)/distance_to_prey;
+                var distance_to_prey = pos.distance(prey_position);
+                this.velocity.x += (prey_position.x - pos.x)*2/(1+distance_to_prey/2);
+                this.velocity.y += (prey_position.y - pos.y)*2/(1+distance_to_prey/2);
             } 
             
         }  else {
