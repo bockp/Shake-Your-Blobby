@@ -28,7 +28,7 @@ var test=function(){
         this.space.updateAgent(this, initial_x, initial_y);
         this.sight = 75;
         this.speed = 3;
-        this.separation_space = 50;
+        this.separation_space = 20;
         this.velocity = new jssim.Vector2D(Math.random(), Math.random());
         this.isPredator = isPredator;
         this.border = 1;
@@ -57,7 +57,7 @@ var test=function(){
         var pos = this.space.getLocation(this.id);
         if(this.isPredator) {
             var prey = null;
-            var min_distance = 10000000;
+            var min_distance = 1000000;
             for (var boidId in boids)
             {
                 var boid = boids[boidId];
@@ -76,15 +76,15 @@ var test=function(){
                     if (distance < this.separation_space)
                     {
                         // Separation
-                        this.velocity.x += pos.x - boid_pos.x;
-                        this.velocity.y += pos.y - boid_pos.y;
+                        this.velocity.x += (pos.x - boid_pos.x)* (1/(distance+1)*50);
+                        this.velocity.y += (pos.y - boid_pos.y)* (1/(distance+1)*50);
                     }
                     else {
-                        if (distance > this.separation_space*2)
+                        if (distance > this.separation_space)
                         {
                             //attraction
-                            this.velocity.x -= pos.x - boid_pos.x;
-                            this.velocity.y -= pos.y - boid_pos.y;
+                            this.velocity.x += (boid_pos.x - pos.x)* (1/(distance+1)*0.05)// - boid_pos.x;
+                            this.velocity.y += (boid_pos.y - pos.y)* (1/(distance+1)*0.05)// - boid_pos.y;
                         }
                     }
                 }
@@ -197,7 +197,8 @@ var test=function(){
 	    //from = to
 	}
         var boid = new Boid(i, startX, startY, space, is_predator);
-        if (i == 10){boid.speed = 0;}
+        //bloquer l'agent 10 sur place
+        //if (i == 10){boid.speed = 0;}
         scheduler.scheduleRepeatingIn(boid, 1);
     }
 
