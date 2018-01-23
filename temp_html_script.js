@@ -30,7 +30,7 @@ var test=function(){
         this.space = space;
         this.space.updateAgent(this, initial_x, initial_y);
         this.sight = 75;
-        this.speed = 3;
+        this.speed = 1;
         this.separation_space = distanceMaxToCenter;
         this.velocity = new jssim.Vector2D(Math.random(), Math.random());
         this.isPredator = isPredator;
@@ -102,15 +102,15 @@ var test=function(){
                     if (distance < this.separation_space)
                     {
                         // Separation
-                        this.velocity.x += (pos.x - boid_pos.x)* (1/(distance+1));
-                        this.velocity.y += (pos.y - boid_pos.y)* (1/(distance+1));
+                        this.velocity.x += (pos.x - boid_pos.x)* (1/(distance+1))*2;
+                        this.velocity.y += (pos.y - boid_pos.y)* (1/(distance+1))*2;
                     }
                     else {
                         if (distance > this.separation_space)
                         {
                             //attraction
-                            this.velocity.x += (boid_pos.x - pos.x)* (distance+1);// - boid_pos.x;
-                            this.velocity.y += (boid_pos.y - pos.y)* (distance+1);// - boid_pos.y;
+                            this.velocity.x += (boid_pos.x - pos.x)* (distance+1)*2;// - boid_pos.x;
+                            this.velocity.y += (boid_pos.y - pos.y)* (distance+1)*2;// - boid_pos.y;
                         }
                     }
                 }
@@ -209,7 +209,7 @@ var test=function(){
     scheduler.reset();
     var space = new jssim.Space2D();
     space.reset();
-    numBoids = 50;
+    numBoids = 150;
 
     var bands = new jssim.Network(numBoids);
     space.network = bands;
@@ -222,7 +222,6 @@ var test=function(){
 	if (is_predator) {
 	    startX = 300;
 	    startY = 300;
-	    //
 	    
 	}
         var boid = new Boid(i, startX, startY, space, is_predator);
@@ -234,7 +233,7 @@ var test=function(){
 	    for (j=4; j < i; j++){
 		
 		var band = new Band(laxDistance, strength);
-		bands.addEdge(new jssim.Edge(j,i,band));
+		//bands.addEdge(new jssim.Edge(j,i,band));
 	    }
 	}
         scheduler.scheduleRepeatingIn(boid, 1);
