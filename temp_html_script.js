@@ -96,7 +96,7 @@ var test=function(){
             } 
             
         }  else {
-            /** deactivate flight response and movement for "prey" blobs.
+            // deactivate flight response and movement for "prey" blobs.
 	    for (var boidId in boids)
             {
                 var boid = boids[boidId];
@@ -122,17 +122,17 @@ var test=function(){
                         this.velocity.x += boid.velocity.x * 0.5;
                         this.velocity.y += boid.velocity.y * 0.5;
                     }
-                }
+                }/*
                 if (boid.isPredator && distance < this.sight)
                 {
                     // Avoid predators.
                     this.velocity.x += pos.x - boid_pos.x;
                     this.velocity.y += pos.y - boid_pos.y;
-                }
+                }*/
             }
-	    */
-	    this.velocity.x = 0;
-	    this.velocity.y = 0;
+	    
+	    //this.velocity.x = 0;
+	    //this.velocity.y = 0;
         }
 
 
@@ -217,9 +217,6 @@ var test=function(){
         bands.addEdge(new jssim.Edge(from,to,band));
     }
 */
-    
-    
-    
     
     var canvas = document.getElementById("myCanvas");
     setInterval(function(){ 
