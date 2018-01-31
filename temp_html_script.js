@@ -52,8 +52,8 @@ var test=function(){
         this.separation_space = distanceMaxToCenter;
         this.velocity = new jssim.Vector2D(Math.random(), Math.random());
         this.isPredator = isPredator;
-	//this.border = 1;
-        //this.boundary = 640;
+	this.border = 1;
+        this.boundary = 640;
         this.size = new jssim.Vector2D(5, 5);
         this.color = '#00ff00';
         if(isPredator){
@@ -102,7 +102,12 @@ var test=function(){
         if(this.isPredator) {
 	    
             var prey = null;
+	    var nearest = 1;
+	    var nearestDist = 1;
+	    var nextNearest = 1;
+	    var nextNearestDist = 1;
             var min_distance = 1000000;
+	    var min_distancePredator = 1000000;
             for (var boidId in boids)
             {
                 var boid = boids[boidId];
@@ -116,24 +121,63 @@ var test=function(){
                 } else {
                     var boid_pos = this.space.getLocation(boid.id);
                     var distance = pos.distance(boid_pos);
+		    // somehow make it only check attraction and repulsion for it's two nearest non-prey neighbours here.
 		    this.laxDistance = 10;
                     this.strength = 0.5;
-                    if (distance < this.separation_space)
-                    {
-                        // Separation
-                        this.velocity.x += (pos.x - boid_pos.x)* (1/(distance+1))*2;
-                        this.velocity.y += (pos.y - boid_pos.y)* (1/(distance+1))*2;
-                    }
-                    else {
-                        if (distance > this.separation_space)
-                        {
-                            //attraction
-                            this.velocity.x += (boid_pos.x - pos.x)* (distance+1)*2;// - boid_pos.x;
-                            this.velocity.y += (boid_pos.y - pos.y)* (distance+1)*2;// - boid_pos.y;
-                        }
+		    if(min_distancePredator > distance){
+                        min_distancePredator = distance;
+			nextNearest = nearest;
+			nextNearestDist = nearestDist;
+			nearest = boidId;
+			nearestDist = distance;
                     }
                 }
             }
+	    // takes into account the separation between
+	    
+	    var nearestBoidLoc = this.space.getLocation(nearest);
+	    
+	    if (nearestDist < this.separation_space)
+	    {
+                // Separation
+                this.velocity.x += (pos.x - nearestBoidLoc.x)* (1/(nearestDist+1))*10;
+                this.velocity.y += (pos.y - nearestBoidLoc.y)* (1/(nearestDist+1))*10;
+	    }
+	    else {
+                    if (nearestDist > this.separation_space)
+                {
+		    //attraction
+		    this.velocity.x += (nearestBoidLoc.x - pos.x)* (nearestDist+1)*10;// - boid_pos.x;
+		    this.velocity.y += (nearestBoidLoc.y - pos.y)* (nearestDist+1)*10;// - boid_pos.y;
+                }
+	    }
+
+
+	    var nextNearestBoidLoc = this.space.getLocation(nextNearest);
+
+	    
+	    if (nextNearestDist < this.separation_space)
+	    {
+                // Separation
+                this.velocity.x += (pos.x - nextNearestBoidLoc.x)* (1/(nextNearestDist+1))*10;
+                this.velocity.y += (pos.y - nextNearestBoidLoc.y)* (1/(nextNearestDist+1))*10;
+	    }
+	    else {
+                    if (nextNearestDist > this.separation_space)
+                {
+		    //attraction
+		    this.velocity.x += (nextNearestBoidLoc.x - pos.x)* (nextNearestDist+1)*10;// - boid_pos.x;
+		    this.velocity.y += (nextNearestBoidLoc.y - pos.y)* (nextNearestDist+1)*10;// - boid_pos.y;
+                }
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
             if(prey != null) {
                 var prey_position = this.space.getLocation(prey.id);
                 var distance_to_prey = pos.distance(prey_position);
@@ -202,7 +246,7 @@ var test=function(){
         if (pos.y < this.border) pos.y = this.boundary - this.border;
         if (pos.x > val) pos.x = this.border;
         if (pos.y > val) pos.y = this.border;
-        //console.log("boid [ " + this.id + "] is at (" + pos.x + ", " + pos.y + ") at time " + this.time);
+        console.log("boid [ " + this.id + "] is at (" + pos.x + ", " + pos.y + ") at time " + this.time);
     };
     
     //
@@ -250,8 +294,8 @@ var test=function(){
         var boid = new Boid(i, startX, startY, space, is_predator);
 	//if (i == 10){boid.speed = 0;}
 	
-	var laxDistance = 10;
-	var strength = 0;
+	var laxDistance = 1;
+	var strength = 1;
 	if (i > 4){
 	    
 	    
@@ -266,7 +310,7 @@ var test=function(){
 	
         scheduler.scheduleRepeatingIn(boid, 1);
     }
-    // add the final link between last blob point and the very frist blob point.
+    // add the final link between last blob entity and the very frist blob entity.
     bands.addEdge(new jssim.Edge(numBoids-1,4,band)); // draw a certain number in a circle, then place all the rest in the middle of that circle, wihtout linkin them.
     
     
