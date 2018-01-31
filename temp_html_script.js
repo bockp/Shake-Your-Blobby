@@ -1,6 +1,18 @@
-/**
- * This is the original script stored in example_draw.html
+ /**
+ * This is the blob script called in example_draw.html
+ * It simulates the blob, it's food source, and it's movement towards that food source.
  */
+
+// Random Integer function - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+
+
+
 
 var test=function(){
     
@@ -15,6 +27,12 @@ var test=function(){
     var distanceMaxToCenter = 55;
     var distanceMinToCenter = 45;
     var blobCenter = new jssim.Space2D(300,300);
+    
+    // define random center of blob at start of simulation.
+    var centerX = 300;
+    var centerY = 300;
+    // define radius of blob as 50
+    var radius = 25;
 
 
     
@@ -34,8 +52,8 @@ var test=function(){
         this.separation_space = distanceMaxToCenter;
         this.velocity = new jssim.Vector2D(Math.random(), Math.random());
         this.isPredator = isPredator;
-        this.border = 1;
-        this.boundary = 640;
+	//this.border = 1;
+        //this.boundary = 640;
         this.size = new jssim.Vector2D(5, 5);
         this.color = '#00ff00';
         if(isPredator){
@@ -82,6 +100,7 @@ var test=function(){
         }
         // Fin bidouillage
         if(this.isPredator) {
+	    
             var prey = null;
             var min_distance = 1000000;
             for (var boidId in boids)
@@ -161,7 +180,7 @@ var test=function(){
 	    this.velocity.x = 0;
 	    this.velocity.y = 0;
         }
-
+	distanceMaxToCenter += 500;
 
 
 	
@@ -209,35 +228,46 @@ var test=function(){
     scheduler.reset();
     var space = new jssim.Space2D();
     space.reset();
-    numBoids = 150;
+    numBoids = 200;
 
     var bands = new jssim.Network(numBoids);
     space.network = bands;
+
+
+   
+
     
     for (var i = 0; i < numBoids; i++) {
         var is_predator = i > 3;
-	var startX = 450;
-	var startY = 450;
+	var startX = getRandomInt(300, 450);
+	var startY = getRandomInt(300, 450);
 	
 	if (is_predator) {
-	    startX = 300;
-	    startY = 300;
+	    startX = centerX + radius*Math.cos(2*Math.PI*(i/numBoids));
+	    startY = centerY + radius*Math.sin(2*Math.PI*(i/numBoids));
 	    
 	}
         var boid = new Boid(i, startX, startY, space, is_predator);
 	//if (i == 10){boid.speed = 0;}
 	
 	var laxDistance = 10;
-	var strength = 1;
+	var strength = 0;
 	if (i > 4){
-	    for (j=4; j < i; j++){
-		
-		var band = new Band(laxDistance, strength);
-		//bands.addEdge(new jssim.Edge(j,i,band));
-	    }
+	    
+	    
+	    var band = new Band(laxDistance, strength);
+	    bands.addEdge(new jssim.Edge(i,i-1,band)); // draw a certain number in a circle, then place all the rest in the middle of that circle, wihtout linkin them.
+	    
+	    
 	}
+	
+	    
+	    
+	
         scheduler.scheduleRepeatingIn(boid, 1);
     }
+    // add the final link between last blob point and the very frist blob point.
+    bands.addEdge(new jssim.Edge(numBoids-1,4,band)); // draw a certain number in a circle, then place all the rest in the middle of that circle, wihtout linkin them.
     
     
     
@@ -246,8 +276,9 @@ var test=function(){
     setInterval(function(){ 
         scheduler.update();
 
+
         space.render(canvas);
-        console.log('current simulation time: ' + scheduler.current_time);
+        //console.log('current simulation time: ' + scheduler.current_time);
         document.getElementById("simTime").value = "Simulation Time: " + scheduler.current_time;
     }, 100);
 };
